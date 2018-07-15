@@ -11,6 +11,7 @@ import Home from './layouts/home/Home'
 
 // Redux Store
 import store from './store'
+import BountyCard from './containers/create-bounty.js';
 
 const history = syncHistoryWithStore(browserHistory, store)
 
@@ -19,6 +20,10 @@ ReactDOM.render((
       <Router history={history}>
         <Route path="/" component={App}>
           <IndexRoute component={Home} />
+          
+          <Route path="task" component={Home}>
+            <Route path="create" component={BountyCard} />
+          </Route>
           {/* <Route path="dashboard" component={UserIsAuthenticated(Dashboard)} />
           <Route path="profile" component={UserIsAuthenticated(Profile)} /> */}
         </Route>

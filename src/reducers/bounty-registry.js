@@ -6,11 +6,12 @@ const defaultState = {
 }
 
 const bountyRegistry = (state = defaultState, action) => {
+  console.log(action, state);
   switch (action.type) {
   case BOUNTY_REGISTRY_CONTRACT_INSTANTATED:
     return {
       ...state,
-      instance: action.payload
+      contract: action.payload
     };
   default:
     return state;

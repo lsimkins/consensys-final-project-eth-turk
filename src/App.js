@@ -19,19 +19,11 @@ class App extends Component {
   componentWillMount() {
     window.addEventListener('load', () => {
       this.props.web3connect();
-      this.props.instantiateBountyContract().then(() => {
-        console.log('intantiated');
-        // this.props.fetchTodos();
-      });
+      this.props.instantiateBountyContract();
     });
   }
 
   render() {
-    let testOutput = null;
-    if (this.props.bountyRegistry) {
-      console.log(this.props.bountyRegistry);
-    }
-
     const OnlyAuthLinks = VisibleOnlyAuth(() =>
       <span>
         <li className="pure-menu-item">
@@ -72,8 +64,7 @@ const mapDispatchToProps = {
 }
 
 const mapStateToProps = (state) => ({
-  web3: state.web3,
-  bountyRegistry: state.bountyRegistry.instance
+  web3: state.web3
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)
