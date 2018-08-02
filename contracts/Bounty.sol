@@ -5,8 +5,8 @@ contract Bounty {
   uint public creationTime = now;
   uint public endTime;
 
-  uint reward;
-  string description;
+  uint public reward;
+  string public description;
 
   struct Claim {
     address claimant;

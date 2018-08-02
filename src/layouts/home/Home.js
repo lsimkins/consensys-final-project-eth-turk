@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import BountyList from '../../containers/bounty-list';
 
 class Home extends Component {
   render() {
@@ -6,8 +7,8 @@ class Home extends Component {
       <main className="container">
         <div className="pure-g">
           <div className="pure-u-1-1">
-            <p>This is your own container</p>
             <div>{ this.props.children }</div>
+            <BountyList />
           </div>
         </div>
       </main>

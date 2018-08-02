@@ -6,7 +6,8 @@ contract BountyRegistry {
   address public owner = msg.sender;
   uint public creationTime = now;
 
-  Bounty test;
+  address[] bounties;
+  event BountyCreated(address contractAddress);
 
   function createBounty(
     uint _reward,
@@ -16,8 +17,10 @@ contract BountyRegistry {
     public
     returns (address newContract)
   {
-    test = new Bounty(_reward, _description, timeLimitSeconds);
+    Bounty newBounty = new Bounty(_reward, _description, timeLimitSeconds);
+    bounties.push(newBounty);
+    emit BountyCreated(address(newBounty));
 
-    return test;
+    return address(newBounty);
   }
 }

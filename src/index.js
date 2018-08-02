@@ -4,6 +4,7 @@ import { Router, Route, IndexRoute, browserHistory } from 'react-router'
 import { Provider } from 'react-redux'
 import { syncHistoryWithStore } from 'react-router-redux'
 import { UserIsAuthenticated } from './util/wrappers.js'
+import './index.css';
 
 // Layouts
 import App from './App'
@@ -20,7 +21,6 @@ ReactDOM.render((
       <Router history={history}>
         <Route path="/" component={App}>
           <IndexRoute component={Home} />
-          
           <Route path="task" component={Home}>
             <Route path="create" component={BountyCard} />
           </Route>
