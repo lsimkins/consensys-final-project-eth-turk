@@ -22,4 +22,12 @@ contract("BountyRegistry", function(accounts) {
 
     assert.equal(await newBounty.reward.call(), 10, "Invalid reward.")
   });
+
+  it("should return the currently active bounties", async () => {
+    const result = await registry.createBounty(10, "test", 10);
+    const bounties = await registry.getBounties();
+    const newAddress = result.logs[0].args.contractAddress;
+
+    assert.equal(bounties[0], newAddress);
+  });
 });

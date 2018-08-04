@@ -6,7 +6,7 @@ contract BountyRegistry {
   address public owner = msg.sender;
   uint public creationTime = now;
 
-  address[] bounties;
+  address[] public bounties;
   event BountyCreated(address contractAddress);
 
   function createBounty(
@@ -22,5 +22,13 @@ contract BountyRegistry {
     emit BountyCreated(address(newBounty));
 
     return address(newBounty);
+  }
+
+  function getBounties()
+    public
+    view
+    returns (address[] allBounties)
+  {
+    return bounties;
   }
 }

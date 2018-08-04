@@ -43,5 +43,5 @@ contract("Bounty", function(accounts) {
 
   it("should not allow claims to be submitted unless the bounty is open", async () => {
     //TODO
-  }
+  });
 });

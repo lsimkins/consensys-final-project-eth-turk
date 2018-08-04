@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-class Bounty extends Component {
+class ClaimBounty extends Component {
   state = {
     reward: null,
     description: null,
@@ -25,22 +25,25 @@ class Bounty extends Component {
 
   render() {
     return (
-      <div className="bounty-row">
-        <div style={{ float: 'left', marginRight: '8px' }}>
-          <button>Claim</button>
-        </div>
-
+      <div className="claim-bounty">
+        <h2>Claim Bounty</h2>
         <div className="bounty-description">
           { this.state.description }
         </div>
-
         <div className="bounty-reward" >
-          <strong>Reward: </strong>
+          <strong>Reward:</strong>
           <span>{ this.state.reward && this.state.reward.toString() }</span>
+        </div>
+        <div>
+          <strong>Proof</strong>
+          <input type="text" />
+        </div>
+        <div>
+          <button>Submit Claim</button>
         </div>
       </div>
     );
   }
 }
 
-export default Bounty
+export default ClaimBounty

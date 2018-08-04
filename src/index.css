@@ -28,3 +28,7 @@ form {
 .bounty-row:not(:last-child) {
   border-bottom: none;
 }
+
+.claim-bounty div {
+  padding: 6px;
+}
