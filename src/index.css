@@ -32,3 +32,7 @@ form {
 .claim-bounty div {
   padding: 6px;
 }
+
+strong {
+  font-weight: bold;
+}

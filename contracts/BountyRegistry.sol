@@ -18,6 +18,7 @@ contract BountyRegistry {
     returns (address newContract)
   {
     Bounty newBounty = new Bounty(_reward, _description, timeLimitSeconds);
+    newBounty.transferOwnership(msg.sender);
     bounties.push(newBounty);
     emit BountyCreated(address(newBounty));
 

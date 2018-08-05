@@ -1,4 +1,5 @@
 /* PAGE */
+@import '~antd/dist/antd.css';
 
 body,
 .pure-g [class*=pure-u] {
@@ -65,4 +66,13 @@ pre {
 .navbar .uport-logo {
   height: 16px;
   margin-right: 10px;
+}
+
+.site-links {
+  padding: 8px 0;
+}
+
+.main-link {
+  padding: 0 8px;
+  border-bottom: 1px solid #ccc;
 }

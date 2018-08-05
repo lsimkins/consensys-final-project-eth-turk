@@ -17,7 +17,7 @@ contract Bounty {
   // Allows iteration through claims.
   // Currently sets an arbitrary limit of 100 claims.
   address[100] claimants;
-  uint numberClaims = 0;
+  uint public numberClaims = 0;
   mapping( address => Claim ) claims;
   address winner;
 
@@ -118,6 +118,13 @@ contract Bounty {
     returns (address, string, bool)
   {
     return claimAsTuple(claims[msg.sender]);
+  }
+
+  function transferOwnership(address to)
+    public
+    onlyBy(owner)
+  {
+    owner = to;
   }
 
   function submitClaim(string validation)

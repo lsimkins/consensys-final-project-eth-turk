@@ -20,7 +20,8 @@ contract("BountyRegistry", function(accounts) {
     const newAddress = result.logs[0].args.contractAddress;
     const newBounty = Bounty.at(newAddress);
 
-    assert.equal(await newBounty.reward.call(), 10, "Invalid reward.")
+    assert.equal(await newBounty.owner.call(), owner, "New bounty not owned by creator");
+    assert.equal(await newBounty.reward.call(), 10, "Invalid reward.");
   });
 
   it("should return the currently active bounties", async () => {

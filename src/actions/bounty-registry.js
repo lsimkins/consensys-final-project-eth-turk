@@ -14,7 +14,7 @@ export function instantiateBountyContract() {
     const bountyRegistry = contract(BountyRegistryContract);
     bountyRegistry.setProvider(web3.currentProvider);
     const registryContract = await bountyRegistry.deployed();
-
+    
     dispatch({
       type: BOUNTY_REGISTRY_CONTRACT_INSTANTATED,
       payload: registryContract
@@ -58,6 +58,10 @@ export function createBounty(bountyParams) {
     const state = getState();
     const web3 = state.web3.instance;
     const contractRegistry = state.bountyRegistry.contract;
+
+    if (!contractRegistry) {
+      window.alert("No registry found! Are you logged into MetaMask and is the registry deployed?");
+    }
 
     contractRegistry.createBounty(reward, description, timeLimit, { from: web3.eth.accounts[0] });
   }
