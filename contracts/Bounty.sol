@@ -19,7 +19,7 @@ contract Bounty {
   address[100] claimants;
   uint public numberClaims = 0;
   mapping( address => Claim ) claims;
-  address winner;
+  address public winner;
 
   enum Stage {
     AcceptingClaims,
@@ -27,7 +27,7 @@ contract Bounty {
     ClosedAwaitingWithdrawal,
     ClosedFinalized
   }
-  Stage stage = Stage.AcceptingClaims;
+  Stage public stage = Stage.AcceptingClaims;
 
   event NewBountyClaim(address claimant, string validation);
 

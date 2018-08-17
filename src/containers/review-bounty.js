@@ -1,18 +1,57 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { createBounty } from '../actions/bounty-registry';
 import Bounty from '../components/bounty';
+import Claim from '../components/claim';
+
+const addressIsSet = address => parseInt(address, 16) !== 0;
 
 class ReviewBounty extends Component {
-  state = {};
+  state = {
+    claimAddresses: []
+  };
+
+  constructor(props) {
+    super(props);
+
+    this.updateState(props);
+  }
+
+  componentWillReceiveProps(props) {
+    this.updateState(props);
+  }
+
+  async updateState(props) {
+    if (props.bounty) {
+      const claimAddresses = await props.bounty.allClaims.call();
+  
+      this.setState({
+        claimAddresses: claimAddresses.filter(addressIsSet)
+      });
+    }
+  }
 
   render() {
-    return (
-      <div>
-        <h2>Review Bounty</h2>
-        <Bounty bounty={this.props.bounty} />
-      </div>
-    );
+    const { bounty } = this.props;
+
+    if (bounty) {
+      return (
+        <div>
+          <h2>Review Bounty</h2>
+          <Bounty bounty={bounty}>
+            <h3>Claims</h3>
+            <em>Choose "Accept Claim" to award claimant the bounty.</em>
+            {
+              this.state.claimAddresses.map(
+                address => <Claim key={address} bounty={bounty} claimAddress={address} />
+              )
+            }
+          </Bounty>
+        </div>
+      );
+    } else {
+      return null;
+    }
   }
 }
 

@@ -33,6 +33,10 @@ form {
   padding: 6px;
 }
 
+.main-link.active {
+  background-color: #eef;
+}
+
 strong {
   font-weight: bold;
 }

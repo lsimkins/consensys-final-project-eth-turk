@@ -8,12 +8,17 @@ class ClaimBounty extends Component {
   state = {
     reward: null,
     description: null,
+    owner: null
   };
 
   constructor(props) {
     super(props);
 
     this.updateState(props);
+  }
+
+  get isOwner() {
+    return this.state.owner === this.props.activeAccount;
   }
 
   componentWillReceiveProps(props) {
@@ -25,10 +30,12 @@ class ClaimBounty extends Component {
       return;
     }
 
+
     const reward = await props.bounty.reward.call();
     const description = await props.bounty.description.call();
+    const owner = await props.bounty.owner.call();
 
-    this.setState({ reward, description });
+    this.setState({ reward, description, owner });
   }
 
   setProof = (changeEvent) => {
@@ -52,6 +59,7 @@ class ClaimBounty extends Component {
     return (
       <div className="claim-bounty">
         <h2>Claim Bounty</h2>
+        { this.isOwner && <h3>This is your bounty!</h3>}
         <div className="bounty-description">
           { this.state.description }
         </div>
@@ -59,12 +67,14 @@ class ClaimBounty extends Component {
           <strong>Reward:</strong>
           <span>{ this.state.reward && this.state.reward.toString() }</span>
         </div>
+        { !this.isOwner &&
+          <div>
+            <strong>Proof</strong>
+            <Input onChange={this.setProof} type="text" />
+          </div>
+        }
         <div>
-          <strong>Proof</strong>
-          <Input onChange={this.setProof} type="text" />
-        </div>
-        <div>
-          <Button onClick={this.onSubmit}>Submit Claim</Button>
+          <Button onClick={this.onSubmit} disabled={this.isOwner}>Submit Claim</Button>
         </div>
       </div>
     );
@@ -77,7 +87,8 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    bounty: state.bounty.contracts[ownProps.routeParams.address]
+    bounty: state.bounty.contracts[ownProps.routeParams.address],
+    activeAccount: state.web3.instance ? state.web3.instance.eth.accounts[0] : null
   };
 }
 
