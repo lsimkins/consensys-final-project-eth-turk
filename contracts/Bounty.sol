@@ -98,6 +98,11 @@ contract Bounty is Destructible {
     _;
   }
 
+  modifier mayAcceptMoreClaims() {
+    require(numberClaims < 10, "No other claims may be made to this contract.");
+    _;
+  }
+
   /**
    * @dev Contructor for a new Bounty contract.
    * @param _reward The bounty reward. Make sure the message contains enough wei to cover the reward.
