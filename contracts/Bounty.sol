@@ -1,6 +1,7 @@
 pragma solidity ^0.4.24;
 
 contract Bounty {
+  // Owner of the bounty.
   address public owner = msg.sender;
 
   // Note: As noted by remix, "now" can be manipulated by miners.
@@ -8,11 +9,19 @@ contract Bounty {
   // this should only be an issue when a bounty expiration time is highly sensitive.
   // A different method of calculating end time should be used in those cases.
   uint public creationTime = now;
+
+  // End timestamp of the bounty.
   uint public endTime;
 
+  // Bounty reward, in wei.
   uint public reward;
+
+  // Description of the bounty.
   string public description;
 
+  /**
+   * A struct representing a single claim on this bounty's reward.
+   */
   struct Claim {
     address claimant;
     string validation;
@@ -21,9 +30,16 @@ contract Bounty {
 
   // Allows iteration through claims.
   // Currently sets an arbitrary limit of 10 claims.
-  address[10] claimants;
+  address[10] public claimants;
+
+  // Number of claims on this bounty.
+  // Tracked in a de-normalized way for efficiency.
   uint public numberClaims = 0;
+
+  // Mapping of claimant addresses to their respective claims.
   mapping( address => Claim ) claims;
+
+  // Winner if this bounty, if any.
   address public winner;
 
   enum Stage {
@@ -34,8 +50,13 @@ contract Bounty {
   }
   Stage public stage = Stage.AcceptingClaims;
 
+  // Emitted when a user has placed a new claim on this bounty.
   event NewBountyClaim(address claimant, string validation);
+
+  // Emitted when the owner accepts a claim on this bounty.
   event BountyWon(address claimant);
+
+  // Emitted when the bounty change changes.
   event StageChanged(Stage stage);
 
   modifier onlyBy(address account, string errorMsg) {
@@ -80,23 +101,12 @@ contract Bounty {
     _;
   }
 
-  function setStage(Stage _stage) internal {
-    stage = _stage;
-    emit StageChanged(stage);
-  }
-
-  function claimAsTuple(Claim claim)
-    internal
-    pure
-    returns(address, string, bool)
-  {
-    return (
-      claim.claimant,
-      claim.validation,
-      claim.isActive
-    );
-  }
-
+  /**
+   * @dev Contructor for a new Bounty contract.
+   * @param _reward The bounty reward. Make sure the message contains enough wei to cover the reward.
+   * @param _description Description of completion requirements to win this bounty.
+   * @param _timeLimitSeconds Time limit for bounty to be completed within.
+   */
   constructor(
     uint _reward,
     string _description,
@@ -108,32 +118,39 @@ contract Bounty {
     endTime = creationTime + timeLimitSeconds;
   }
 
-  function allClaims()
-    public
-    view
-    onlyByOwner()
-    returns (address[10])
-  {
-    return claimants;
-  }
-
+  /**
+   * @dev Returns a specific bounty claim.
+   * @param from The claimant address.
+   * @return claimant The claimant address
+   * @return proof    Claimant proof of completing bounty.
+   * @return isActive Is the claim active?
+   */
   function findClaim(address from)
     public
     view
     onlyByOwner()
-    returns (address, string, bool)
+    returns (address claimant, string proof, bool isActive)
   {
     return claimAsTuple(claims[from]);
   }
 
+  /**
+   * @dev Returns the msg sender's claim.
+   * @return claimant The claimant address.
+   * @return proof    Claimant proof of completing bounty.
+   * @return isActive Is the claim active?
+   */
   function myClaim()
     public
     view
-    returns (address, string, bool)
+    returns (address claimant, string proof, bool isActive)
   {
     return claimAsTuple(claims[msg.sender]);
   }
 
+  /**
+   * @dev Transfers ownership of this contract.
+   */
   function transferOwnership(address to)
     public
     onlyByOwner()
@@ -141,6 +158,9 @@ contract Bounty {
     owner = to;
   }
 
+  /**
+   * @dev Closes this contract before expiration for review of claims.
+   */
   function closeForReview()
     public
     atStage(Stage.AcceptingClaims)
@@ -149,6 +169,10 @@ contract Bounty {
     setStage(Stage.ClosedInReview);
   }
 
+  /**
+   * @dev Submits a claim to this bounty.
+   * @param validation Sender's proof of completion.
+   */
   function submitClaim(string validation)
     public
     checkStage()
@@ -164,6 +188,10 @@ contract Bounty {
     emit NewBountyClaim(newClaim.claimant, newClaim.validation);
   }
 
+  /**
+   * @dev Accepts an claimant's claim to this bounty, and marks them as the winner.
+   * @param claimant Address of winning claimant.
+   */
   function acceptClaim(address claimant)
     public
     checkStage()
@@ -177,6 +205,9 @@ contract Bounty {
     emit BountyWon(winner);
   }
 
+  /**
+   * @dev Sends the bounty award to the bounty winner.
+   */
   function sendAward()
     public
     atStage(Stage.ClosedAwaitingWithdrawal)
@@ -184,5 +215,28 @@ contract Bounty {
   {
     setStage(Stage.ClosedFinalized);
     winner.transfer(reward);
+  }
+
+  /**
+   * @dev Sets the current bounty stage.
+   */
+  function setStage(Stage _stage) internal {
+    stage = _stage;
+    emit StageChanged(stage);
+  }
+
+  /**
+   * @dev Formats a claim struct as a tuple.
+   */
+  function claimAsTuple(Claim claim)
+    internal
+    pure
+    returns(address, string, bool)
+  {
+    return (
+      claim.claimant,
+      claim.validation,
+      claim.isActive
+    );
   }
 }

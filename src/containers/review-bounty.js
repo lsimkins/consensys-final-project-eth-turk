@@ -22,7 +22,7 @@ class ReviewBounty extends Component {
 
   async updateState(props) {
     if (props.bounty) {
-      const claimAddresses = await props.bounty.allClaims.call();
+      const claimAddresses = await props.bounty.claims.call();
   
       this.setState({
         claimAddresses: claimAddresses.filter(addressIsSet)
