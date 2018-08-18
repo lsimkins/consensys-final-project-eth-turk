@@ -2,6 +2,11 @@ pragma solidity ^0.4.24;
 
 contract Bounty {
   address public owner = msg.sender;
+
+  // Note: As noted by remix, "now" can be manipulated by miners.
+  // This creation time is used to calculate the end time of the bounty,
+  // this should only be an issue when a bounty expiration time is highly sensitive.
+  // A different method of calculating end time should be used in those cases.
   uint public creationTime = now;
   uint public endTime;
 
@@ -15,8 +20,8 @@ contract Bounty {
   }
 
   // Allows iteration through claims.
-  // Currently sets an arbitrary limit of 100 claims.
-  address[100] claimants;
+  // Currently sets an arbitrary limit of 10 claims.
+  address[10] claimants;
   uint public numberClaims = 0;
   mapping( address => Claim ) claims;
   address public winner;
@@ -30,34 +35,41 @@ contract Bounty {
   Stage public stage = Stage.AcceptingClaims;
 
   event NewBountyClaim(address claimant, string validation);
+  event BountyWon(address claimant);
+  event StageChanged(Stage stage);
 
-  modifier onlyBy(address account) {
-    require(msg.sender == account);
+  modifier onlyBy(address account, string errorMsg) {
+    require(msg.sender == account, errorMsg);
     _;
   }
 
-  modifier onlyByEither(address account1, address account2) {
-    require(msg.sender == account1 || msg.sender == account2);
+  modifier onlyByOwner() {
+    require(msg.sender == owner, "Only the bounty owner can perform this action.");
+    _;
+  }
+
+  modifier onlyByEither(address account1, address account2, string errorMsg) {
+    require(msg.sender == account1 || msg.sender == account2, errorMsg);
     _;
   }
 
   modifier notBy(address account) {
-    require(msg.sender != account);
+    require(msg.sender != account, "Message sender may not perform this action");
     _;
   }
 
   modifier isClaimant(address maybeClaimant) {
-    require(claims[maybeClaimant].isActive);
+    require(claims[maybeClaimant].isActive, "Address must be a valid bounty claimant.");
     _;
   }
 
-  modifier notClaimant(address maybeClaimant) {
-    require(!claims[maybeClaimant].isActive);
+  modifier notClaimant(address maybeClaimant, string errorMsg) {
+    require(!claims[maybeClaimant].isActive, errorMsg);
     _;
   }
 
   modifier atStage(Stage _stage) {
-    require(stage == _stage);
+    require(stage == _stage, "Contract is not in the correct stage.");
     _;
   }
 
@@ -70,6 +82,7 @@ contract Bounty {
 
   function setStage(Stage _stage) internal {
     stage = _stage;
+    emit StageChanged(stage);
   }
 
   function claimAsTuple(Claim claim)
@@ -88,7 +101,8 @@ contract Bounty {
     uint _reward,
     string _description,
     uint timeLimitSeconds
-  ) public {
+  ) public payable {
+    require(msg.value >= reward, "Bounty reward must be sent with contract");
     reward = _reward;
     description = _description;
     endTime = creationTime + timeLimitSeconds;
@@ -97,8 +111,8 @@ contract Bounty {
   function allClaims()
     public
     view
-    onlyBy(owner)
-    returns (address[100])
+    onlyByOwner()
+    returns (address[10])
   {
     return claimants;
   }
@@ -106,7 +120,7 @@ contract Bounty {
   function findClaim(address from)
     public
     view
-    onlyBy(owner)
+    onlyByOwner()
     returns (address, string, bool)
   {
     return claimAsTuple(claims[from]);
@@ -122,9 +136,17 @@ contract Bounty {
 
   function transferOwnership(address to)
     public
-    onlyBy(owner)
+    onlyByOwner()
   {
     owner = to;
+  }
+
+  function closeForReview()
+    public
+    atStage(Stage.AcceptingClaims)
+    onlyByOwner()
+  {
+    setStage(Stage.ClosedInReview);
   }
 
   function submitClaim(string validation)
@@ -132,7 +154,7 @@ contract Bounty {
     checkStage()
     atStage(Stage.AcceptingClaims)
     notBy(owner)
-    notClaimant(msg.sender)
+    notClaimant(msg.sender, "Sender is already a claimant of this bounty.")
   {
     Claim memory newClaim = Claim(msg.sender, validation, true);
     claims[msg.sender] = newClaim;
@@ -146,17 +168,19 @@ contract Bounty {
     public
     checkStage()
     atStage(Stage.ClosedInReview)
-    onlyBy(owner)
+    onlyByOwner()
     isClaimant(claimant)
   {
     setStage(Stage.ClosedAwaitingWithdrawal);
     winner = claimant;
+
+    emit BountyWon(winner);
   }
 
   function sendAward()
     public
     atStage(Stage.ClosedAwaitingWithdrawal)
-    onlyByEither(owner, winner)
+    onlyByEither(owner, winner, "Only owner or winner may trigger award withdrawal.")
   {
     setStage(Stage.ClosedFinalized);
     winner.transfer(reward);

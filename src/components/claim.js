@@ -3,10 +3,6 @@ import { Button } from 'antd';
 import { connect } from 'react-redux';
 import { acceptBountyClaim } from '../actions/bounty';
 import {
-  ACCEPTING_CLAIMS,
-  CLOSED_IN_REVIEW,
-  CLOSED_AWAITING_WITHDRAWAL,
-  CLOSED_FINALIZED,
   BountyStages
 } from '../models/BountyStage';
 

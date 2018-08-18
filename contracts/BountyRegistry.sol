@@ -15,9 +15,10 @@ contract BountyRegistry {
     uint timeLimitSeconds
   )
     public
+    payable
     returns (address newContract)
   {
-    Bounty newBounty = new Bounty(_reward, _description, timeLimitSeconds);
+    Bounty newBounty = (new Bounty).value(msg.value)(_reward, _description, timeLimitSeconds);
     newBounty.transferOwnership(msg.sender);
     bounties.push(newBounty);
     emit BountyCreated(address(newBounty));

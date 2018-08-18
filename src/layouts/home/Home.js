@@ -34,7 +34,7 @@ class Home extends Component {
             </div>
           <div style={{ padding: '6px' }}>
             <Button>
-              <Link to="task/create">Create New Bounty</Link>
+              <Link to="/task/create">Create New Bounty</Link>
             </Button>
           </div>
           <div>{ this.props.children }</div>

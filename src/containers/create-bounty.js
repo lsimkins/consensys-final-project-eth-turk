@@ -51,7 +51,7 @@ class CreateBountyForm extends Component {
         { this.props.owner }
         <form onSubmit={this.onSubmit}>
           <div className="form-input-row">
-            <label>Reward</label>
+            <label>Reward (Wei)</label>
             <input type="text" name="reward" onChange={this.setBountyParam('reward')} />
           </div>
           <div className="form-input-row">
@@ -59,7 +59,7 @@ class CreateBountyForm extends Component {
             <input type="text" name="description" onChange={this.setBountyParam('description')}/>
           </div>
           <div className="form-input-row">
-            <label>Time Limit</label>
+            <label>Time Limit (Seconds)</label>
             <input type="text" name="timeLimit" onChange={this.setBountyParam('timeLimit')}/>
           </div>
           <div className="form-input-row">

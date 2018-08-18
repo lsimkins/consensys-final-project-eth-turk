@@ -1,4 +1,3 @@
-import { WEB3_CONNECTED } from '../actions/web3';
 import { BOUNTY_REGISTRY_CONTRACT_INSTANTATED } from '../actions/bounty-registry';
 
 const defaultState = {

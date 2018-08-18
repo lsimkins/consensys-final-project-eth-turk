@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 import { createBounty } from '../actions/bounty-registry';
 import Bounty from '../components/bounty';
 import Claim from '../components/claim';
-
-const addressIsSet = address => parseInt(address, 16) !== 0;
+import { addressIsSet } from '../util/bounty';
 
 class ReviewBounty extends Component {
   state = {

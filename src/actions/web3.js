@@ -1,5 +1,4 @@
 import Web3 from 'web3';
-import contract from 'truffle-contract';
 
 export const WEB3_CONNECTED = 'WEB3_CONNECTED';
 export const WEB3_DISCONNECTED = 'WEB3_DISCONNECTED';

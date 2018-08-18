@@ -10,7 +10,7 @@ contract("BountyRegistry", function(accounts) {
   let registry;
   beforeEach(() => {
     return BountyRegistry
-      .new(100, "Pass Test Suite", 3600)
+      .new()
       .then(instance => registry = instance);
   })
 
@@ -30,5 +30,12 @@ contract("BountyRegistry", function(accounts) {
     const newAddress = result.logs[0].args.contractAddress;
 
     assert.equal(bounties[0], newAddress);
+  });
+
+  it("should send the msg value to the bounty on creation", async () => {
+    const result = await registry.createBounty(10, "test", 10, { value: 10 });
+    const newAddress = result.logs[0].args.contractAddress;
+
+    console.log(await web3.eth.getBalance(newAddress));
   });
 });

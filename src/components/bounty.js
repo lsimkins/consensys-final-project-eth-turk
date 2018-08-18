@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { BountyStages } from '../models/BountyStage';
-
-const addressIsSet = address => parseInt(address, 16) !== 0;
+import { addressIsSet, isExpired } from '../util/bounty';
 
 class Bounty extends Component {
   state = {
@@ -21,6 +20,10 @@ class Bounty extends Component {
 
   componentWillReceiveProps(props) {
     this.updateState(props);
+  }
+
+  get secondsUntilEnd() {
+    return parseInt(this.state.endTime - (Date.now()/1000), 10);
   }
 
   async updateState(props) {
@@ -44,7 +47,7 @@ class Bounty extends Component {
   }
 
   render() {
-    const { address, description, reward, endTime, numberClaims, winner, stage } = this.state;
+    const { description, reward, endTime, numberClaims, winner, stage } = this.state;
     return (
       <div className="bounty-row">
         <div className="bounty-description">
@@ -63,7 +66,13 @@ class Bounty extends Component {
 
         <div className="bounty-ends-in" >
           <strong>Ends In: </strong>
-          <span>{ parseInt(endTime - (Date.now()/1000), 10) } seconds</span>
+          <span>
+            {
+              isExpired(endTime) ?
+                "Bounty Ended!" :
+                this.secondsUntilEnd + " seconds"
+            }
+          </span>
         </div>
 
         <div className="bounty-claims" >

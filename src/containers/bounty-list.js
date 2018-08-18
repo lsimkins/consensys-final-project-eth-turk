@@ -5,6 +5,7 @@ import { values } from 'lodash';
 import { Button } from 'antd';
 import { Link } from 'react-router';
 import { collectReward } from '../actions/bounty';
+import { BountyStages, CLOSED_AWAITING_WITHDRAWAL, ACCEPTING_CLAIMS } from '../models/BountyStage';
 
 class BountyList extends Component {
   state = {
@@ -28,66 +29,78 @@ class BountyList extends Component {
   }
 
   async updateState(props) {
+    const bountyContracts = props.bounties;
+    const { owner } = props;
+    let bounties = [];
     // Note: this is a quick and dirty method of doing this for a project.
     // These blocks with async calls and duplicate code
     // should never happen in a production application.
     if (this.props.context === 'review') {
-      const { bounties, owner } = props;
-      const showBounties = [];
-      for (var i = 0; i < bounties.length; i++) {
-        const bountyOwner = await bounties[i].owner.call();
+      for (let i = 0; i < bountyContracts.length; i++) {
+        const bountyOwner = await bountyContracts[i].owner.call();
         if (bountyOwner === owner) {
-          showBounties.push(bounties[i]);
+          bounties.push({
+            contract: bountyContracts[i],
+            bountyOwner
+          });
         }
       }
-
-      this.setState({ bounties: showBounties });
     } else if (this.props.context === 'won') {
-      const { bounties, owner } = props;
-      const showBounties = [];
-      for (var i = 0; i < bounties.length; i++) {
-        const bountyWinner = await bounties[i].winner.call();
+      for (let i = 0; i < bountyContracts.length; i++) {
+        const bountyWinner = await bountyContracts[i].winner.call();
         if (bountyWinner === owner) {
-          showBounties.push(bounties[i]);
+          bounties.push({
+            contract: bountyContracts[i],
+            stage: await bountyContracts[i].stage.call(),
+            winner: bountyWinner
+          });
         }
       }
-
-      this.setState({ bounties: showBounties });
     } else {
-      this.setState({ bounties: props.bounties });
+      for (let i = 0; i < bountyContracts.length; i++) {
+        bounties.push({
+          contract: bountyContracts[i],
+          stage: await bountyContracts[i].stage.call(),
+          winner: await bountyContracts[i].winner.call()
+        });
+      }
     }
+
+    this.setState({ bounties });
   }
 
   renderBountyContent = (bounty) => {
     if (this.props.context === 'review') {
       return (
         <Button style={{ width: '200px' }}>
-          <Link to={`/task/review-claims/${bounty.address}`}>Review Claims</Link>
+          <Link to={`/task/review-claims/${bounty.contract.address}`}>Review Claims</Link>
         </Button>
       );
     } else if (this.props.context === 'won') {
       return (
         <Button
-          onClick={() => this.props.collectReward(bounty.address)}
+          onClick={() => this.props.collectReward(bounty.contract.address)}
           style={{ width: '200px' }}
+          disabled={ BountyStages[bounty.stage] !== CLOSED_AWAITING_WITHDRAWAL }
         >
           Collect Reward
         </Button>
       );
     } else {
       return (
-        <Button style={{ width: '200px' }}>
-          <Link to={`/task/claim/${bounty.address}`}>Claim</Link>
+        <Button
+          style={{ width: '200px' }}
+          disabled={ BountyStages[bounty.stage] !== ACCEPTING_CLAIMS }
+        >
+          <Link to={`/task/claim/${bounty.contract.address}`}>Claim</Link>
         </Button>
       );
     }
-
-    return null;
   }
 
   renderBounty = (bounty) => {
     return (
-      <Bounty key={bounty.address} bounty={bounty}>
+      <Bounty key={bounty.contract.address} bounty={bounty.contract}>
         { this.renderBountyContent(bounty) }
       </Bounty>
     );

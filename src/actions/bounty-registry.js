@@ -63,6 +63,11 @@ export function createBounty(bountyParams) {
       window.alert("No registry found! Are you logged into MetaMask and is the registry deployed?");
     }
 
-    contractRegistry.createBounty(reward, description, timeLimit, { from: web3.eth.accounts[0] });
+    contractRegistry.createBounty(
+      reward,
+      description,
+      timeLimit,
+      { from: web3.eth.accounts[0], value: reward }
+    );
   }
 }
