@@ -1,6 +1,6 @@
 const { catchRevert } = require('./exceptions.test.js');
 
-var Bounty = artifacts.require("./Bounty.sol");
+const Bounty = artifacts.require("./Bounty.sol");
 
 contract("Bounty", function(accounts) {
 

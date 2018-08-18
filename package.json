@@ -51,6 +51,7 @@
   "dependencies": {
     "antd": "^3.7.3",
     "lodash": "^4.17.10",
+    "openzeppelin-solidity": "1.12.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-redux": "^5.0.2",
@@ -107,5 +108,21 @@
   },
   "eslintConfig": {
     "extends": "react-app"
-  }
+  },
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lsimkins/geo-turk.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lsimkins/geo-turk/issues"
+  },
+  "homepage": "https://github.com/lsimkins/geo-turk#readme",
+  "description": ""
 }

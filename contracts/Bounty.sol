@@ -1,9 +1,8 @@
 pragma solidity ^0.4.24;
 
-contract Bounty {
-  // Owner of the bounty.
-  address public owner = msg.sender;
+import "../node_modules/openzeppelin-solidity/contracts/lifecycle/Destructible.sol";
 
+contract Bounty is Destructible {
   // Note: As noted by remix, "now" can be manipulated by miners.
   // This creation time is used to calculate the end time of the bounty,
   // this should only be an issue when a bounty expiration time is highly sensitive.
@@ -19,15 +18,6 @@ contract Bounty {
   // Description of the bounty.
   string public description;
 
-  /**
-   * A struct representing a single claim on this bounty's reward.
-   */
-  struct Claim {
-    address claimant;
-    string validation;
-    bool isActive;
-  }
-
   // Allows iteration through claims.
   // Currently sets an arbitrary limit of 10 claims.
   address[10] public claimants;
@@ -42,12 +32,19 @@ contract Bounty {
   // Winner if this bounty, if any.
   address public winner;
 
+  struct Claim {
+    address claimant;
+    string validation;
+    bool isActive;
+  }
+
   enum Stage {
     AcceptingClaims,
     ClosedInReview,
     ClosedAwaitingWithdrawal,
     ClosedFinalized
   }
+
   Stage public stage = Stage.AcceptingClaims;
 
   // Emitted when a user has placed a new claim on this bounty.
@@ -105,7 +102,7 @@ contract Bounty {
    * @dev Contructor for a new Bounty contract.
    * @param _reward The bounty reward. Make sure the message contains enough wei to cover the reward.
    * @param _description Description of completion requirements to win this bounty.
-   * @param _timeLimitSeconds Time limit for bounty to be completed within.
+   * @param timeLimitSeconds Time limit for bounty to be completed within.
    */
   constructor(
     uint _reward,
@@ -146,16 +143,6 @@ contract Bounty {
     returns (address claimant, string proof, bool isActive)
   {
     return claimAsTuple(claims[msg.sender]);
-  }
-
-  /**
-   * @dev Transfers ownership of this contract.
-   */
-  function transferOwnership(address to)
-    public
-    onlyByOwner()
-  {
-    owner = to;
   }
 
   /**
