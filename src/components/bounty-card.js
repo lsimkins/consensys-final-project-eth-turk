@@ -12,10 +12,20 @@ class BountyCard extends Component {
     winner: null
   };
 
-  constructor(props) {
-    super(props);
+  watchers = [];
 
-    this.updateState(props);
+  componentWillMount() {
+    this.updateState(this.props);
+    this.watchers = [
+      this.props.bounty.StageChanged().watch(() => this.updateState(this.props)),
+      this.props.bounty.BountyWon().watch(() => this.updateState(this.props)),
+      this.props.bounty.NewBountyClaim().watch(() => this.updateState(this.props))
+    ];
+  }
+
+  componentWillUnmount() {
+    this.watchers.forEach(watcher => watcher.stopWatching());
+    this.watchers = [];
   }
 
   componentWillReceiveProps(props) {

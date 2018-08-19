@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { BountyStages } from '../models/BountyStage';
-import { addressIsSet, isExpired } from '../util/bounty';
+import { isExpired } from '../util/bounty';
+import CountDown from './count-down';
 
 class BountyListItem extends Component {
   state = {
@@ -12,10 +13,20 @@ class BountyListItem extends Component {
     winner: null
   };
 
-  constructor(props) {
-    super(props);
+  watchers = [];
 
-    this.updateState(props);
+  componentWillMount() {
+    this.updateState(this.props);
+    this.watchers = [
+      this.props.bounty.StageChanged().watch(() => this.updateState(this.props)),
+      this.props.bounty.BountyWon().watch(() => this.updateState(this.props)),
+      this.props.bounty.NewBountyClaim().watch(() => this.updateState(this.props))
+    ];
+  }
+
+  componentWillUnmount() {
+    this.watchers.forEach(watcher => watcher.stopWatching());
+    this.watchers = [];
   }
 
   componentWillReceiveProps(props) {
@@ -48,7 +59,7 @@ class BountyListItem extends Component {
   }
 
   render() {
-    const { description, reward, endTime, numberClaims, winner, stage } = this.state;
+    const { description, reward, endTime, numberClaims, stage } = this.state;
     return (
       <li className="bounty-row">
         <div className="bounty-row-actions" style={{ padding: '6px' }}>
@@ -75,7 +86,7 @@ class BountyListItem extends Component {
               {
                 isExpired(endTime) ?
                   "Bounty Ended!" :
-                  this.secondsUntilEnd + " seconds"
+                  <CountDown endTime={endTime} />
               }
             </span>
           </div>

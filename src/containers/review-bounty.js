@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createBounty } from '../actions/bounty-registry';
-import BountyCard from '../components/bounty-card';
 import Claim from '../components/claim';
 import { addressIsSet } from '../util/bounty';
 
@@ -23,8 +22,6 @@ class ReviewBounty extends Component {
   async updateState(props) {
     if (props.bounty) {
       const claimAddresses = await props.bounty.allClaims.call();
-  
-      console.log(claimAddresses);
 
       this.setState({
         claimAddresses: claimAddresses.filter(addressIsSet)

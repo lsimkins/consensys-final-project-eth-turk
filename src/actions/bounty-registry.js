@@ -2,19 +2,21 @@ import contract from 'truffle-contract';
 import BountyRegistryContract from '../../build/contracts/BountyRegistry.json';
 import Bounty from '../../build/contracts/Bounty.json';
 import { BOUNTY_CONTRACT_CREATED } from './bounty';
+import { notification } from 'antd';
 
 export const BOUNTY_REGISTRY_CONTRACT_INSTANTATED = 'BOUNTY_REGISTRY_CONTRACT_INSTANTATED'
 
 export function instantiateBountyContract() {
-  let web3, dispatch;
+  let web3, dispatch, getState;
 
-  return async (_dispatch, getState) => {
+  return async (_dispatch, _getState) => {
     dispatch = _dispatch
+    getState = _getState
     web3 = getState().web3.instance;
     const bountyRegistry = contract(BountyRegistryContract);
     bountyRegistry.setProvider(web3.currentProvider);
     const registryContract = await bountyRegistry.deployed();
-    
+
     dispatch({
       type: BOUNTY_REGISTRY_CONTRACT_INSTANTATED,
       payload: registryContract
@@ -33,6 +35,13 @@ export function instantiateBountyContract() {
       if (err) {
         // TODO: Error handling
         return;
+      }
+
+      if (!getState().bounty.contracts[result.args.contractAddress]) {
+        notification.success({
+          message: 'New Bounty Created!',
+          description: result.args.contractAddress
+        });
       }
 
       addBountyContract(result.args.contractAddress)

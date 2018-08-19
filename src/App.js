@@ -4,8 +4,7 @@ import { withRouter } from 'react-router';
 import {web3connect} from './actions/web3.js';
 import {instantiateBountyContract} from './actions/bounty-registry.js';
 import { Layout, Menu } from 'antd';
-const { Header, Footer, Content, Sider } = Layout;
-const { SubMenu } = Menu;
+const { Header, Content, Sider } = Layout;
 import { Link } from 'react-router';
 
 // Styles

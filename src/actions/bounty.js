@@ -2,7 +2,6 @@ export const BOUNTY_CONTRACT_CREATED = 'BOUNTY_CONTRACT_CREATED';
 export const SUBMIT_BOUNTY_CLAIM = 'SUBMIT_BOUNTY_CLAIM';
 
 export function submitBountyClaim(address, validation) {
-
   return async (dispatch, getState) => {
     const state = getState();
     const contract = state.bounty.contracts[address];

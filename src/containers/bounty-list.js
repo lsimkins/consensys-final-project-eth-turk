@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { values } from 'lodash';
 import { Button, List } from 'antd';
-import { Link } from 'react-router';
 import { collectReward } from '../actions/bounty';
 import { BountyStages, CLOSED_AWAITING_WITHDRAWAL, ACCEPTING_CLAIMS, CLOSED_FINALIZED } from '../models/BountyStage';
 import BountyListItem from '../components/bounty-list-item';
@@ -103,15 +102,15 @@ class BountyList extends Component {
       </Button>,
     ];
 
-    if (owner == bounty.owner) {
+    if (owner === bounty.owner) {
       buttons.push(
         <Button
-          key="rewiew-claims"
+          key="review-claims"
           style={{ width: '140px' }}
           onClick={this.onReviewBountyClick(bounty)}
           disabled={
-            BountyStages[bounty.stage] == CLOSED_AWAITING_WITHDRAWAL ||
-            BountyStages[bounty.stage] == CLOSED_FINALIZED
+            BountyStages[bounty.stage] === CLOSED_AWAITING_WITHDRAWAL ||
+            BountyStages[bounty.stage] === CLOSED_FINALIZED
           }
         >
           Review Claims
@@ -130,7 +129,7 @@ class BountyList extends Component {
       );
     }
 
-    if (owner == bounty.winner) {
+    if (owner === bounty.winner) {
       buttons.push(
         <Button
           onClick={() => this.props.collectReward(bounty.contract.address)}

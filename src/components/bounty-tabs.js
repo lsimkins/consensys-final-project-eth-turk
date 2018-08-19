@@ -1,20 +1,8 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router';
-import { Button, Tabs } from 'antd';
+import { Tabs } from 'antd';
 import BountyList, { BOUNTY_LIST_FILTER } from '../containers/bounty-list';
 
 const { TabPane } = Tabs;
-
-const tabs = [{
-  path: '/task/view-all',
-  title: 'All Bounties'
-}, {
-  path: '/task/review',
-  title: 'My Posted Bounties'
-}, {
-  path: '/task/view-won',
-  title: 'My Won Bounties'
-}];
 
 class BountyTabs extends Component {
   renderBountyList = (filter) => {

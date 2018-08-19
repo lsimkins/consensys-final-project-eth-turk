@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import BountyList from '../containers/bounty-list';
 import BountyCard from './bounty-card';
 import ReviewBounty from '../containers/review-bounty';
 import BountyTabs from './bounty-tabs';

@@ -1,12 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, Route, IndexRoute, IndexRedirect, browserHistory, Redirect } from 'react-router'
+import { Router, Route, IndexRoute, browserHistory, Redirect } from 'react-router'
 import { Provider } from 'react-redux'
 import { syncHistoryWithStore } from 'react-router-redux'
 import './index.css';
 import ViewBounties from './components/view-bounties';
-import ReviewBounty from './containers/review-bounty';
-import BountyTabs from './components/bounty-tabs';
 
 // Layouts
 import App from './App'
@@ -15,7 +13,6 @@ import Home from './layouts/home/Home'
 // Redux Store
 import store from './store'
 import BountyCard from './containers/create-bounty';
-import ClaimBounty from './containers/claim-bounty';
 
 const history = syncHistoryWithStore(browserHistory, store)
 
