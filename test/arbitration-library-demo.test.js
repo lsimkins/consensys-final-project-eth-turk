@@ -11,6 +11,11 @@ const Verdicts = {
   5: "FinalWinnerChanged"
 };
 
+/**
+ * These tests were chosen to test basic arbitration.
+ * Since the arbitration contract is meant to demonstrate library usage,
+ * these test for only very basic functionality.
+ */
 contract("Arbitration", function(accounts) {
 
   const owner = accounts[0]

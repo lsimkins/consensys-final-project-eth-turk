@@ -1,6 +1,10 @@
 const BountyRegistry = artifacts.require("./BountyRegistry.sol");
 const Bounty = artifacts.require("./Bounty.sol");
 
+/**
+ * These tests were chosen to verify the registry performs its job as a
+ * simple factory and contract registry. Also tested is pagination through the registry contracts.
+ */
 contract("BountyRegistry", function(accounts) {
 
   const owner = accounts[0]

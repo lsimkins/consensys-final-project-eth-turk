@@ -2,8 +2,12 @@ const { catchRevert } = require('./exceptions.test.js');
 
 const Bounty = artifacts.require("./Bounty.sol");
 
+/**
+ * These tests were chosen to test the lifecycle of a bounty, from creation to final award.
+ * Tests are also written to verify contract restricts actions against the contract
+ * to specific users and contract lifecycle stages.
+ */
 contract("Bounty", function(accounts) {
-
   const owner = accounts[0]
   const alice = accounts[1];
   const bob = accounts[2];
@@ -46,7 +50,7 @@ contract("Bounty", function(accounts) {
 
   it("should allow the owner to close claim submissions for early review", async () => {
     const validation = "validation";
-    const result = await newBounty.submitClaim(validation, { from: alice });
+    await newBounty.submitClaim(validation, { from: alice });
     await newBounty.closeForReview({ from: owner });
 
     const stage = await newBounty.stage.call({ from: owner });
@@ -64,9 +68,28 @@ contract("Bounty", function(accounts) {
     expect(winner, "Incorrect bounty winner").to.be.equal(alice);
   });
 
+  it("should not allow any another address/account to select a bounty winner", async () => {
+    const validation = "validation";
+    await newBounty.submitClaim(validation, { from: alice });
+    await newBounty.closeForReview({ from: owner });
+    await catchRevert(await newBounty.acceptClaim(alice, { from: bob }));
+    await catchRevert(await newBounty.acceptClaim(alice, { from: alice }));
+  });
+
+  it("should emit \"BountyWon\" event with bounty winner", async () => {
+    const validation = "validation";
+    await newBounty.submitClaim(validation, { from: alice });
+    await newBounty.closeForReview({ from: owner });
+    const result = await newBounty.acceptClaim(alice, { from: owner });
+    const event = result.logs.find(log => log.event === 'BountyWon');
+
+    expect(event, "No event was emitted.").to.not.be.undefined;
+    expect(event.args.winner).to.be.equal(alice);
+  });
+
   it("should allow the owner to trigger award withdrawal", async () => {
     const validation = "validation";
-    const result = await newBounty.submitClaim(validation, { from: alice });
+    await newBounty.submitClaim(validation, { from: alice });
 
     const balanceBefore = await web3.eth.getBalance(alice);
 
@@ -82,5 +105,26 @@ contract("Bounty", function(accounts) {
   it("should not allow claims to be submitted unless the bounty is open", async () => {
     await newBounty.closeForReview({ from: owner });
     await catchRevert(newBounty.submitClaim("validation", { from: alice }));
+  });
+
+  it("should implement a circuit breaker, allowing owner to pause contract in emergency", async () => {
+    await newBounty.pause({ from: owner });
+
+    // Test pause in "AcceptingClaims" stage.
+    await catchRevert(newBounty.submitClaim("validation", { from: alice }));
+    await catchRevert(newBounty.closeForReview({ from: owner }));
+    await newBounty.unpause({ from: owner });
+
+    // Test pause in "ClosedInReview" stage.
+    await newBounty.submitClaim("validation", { from: alice });
+    await newBounty.closeForReview({ from: owner });
+    await newBounty.pause({ from: owner });
+    await catchRevert(newBounty.acceptClaim(alice, { from: owner }));
+    await newBounty.unpause({ from: owner });
+
+    // Test pause in "ClosedAwaitingWithdrawal" stage.
+    await newBounty.acceptClaim(alice, { from: owner });
+    await newBounty.pause({ from: owner });
+    await catchRevert(newBounty.sendAward({ from: alice }));
   });
 });

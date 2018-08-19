@@ -47,11 +47,49 @@ contract Bounty is Destructible {
 
   Stage public stage = Stage.AcceptingClaims;
 
+  // Circuit Breaker
+  // Normally, this standard functionality would come from a library,
+  // but it is implemented here for demonstration purposes.
+  bool public paused = false;
+  event ContractPaused();
+  event ContractUnpaused();
+  modifier onlyWhenNotPaused() {
+    require(!paused, "Contract is paused.");
+    _;
+  }
+  modifier onlyWhenPaused() {
+    require(paused, "May only be called when contract is paused.");
+    _;
+  }
+  /**
+   * @dev Pauses this contract. **Important: Does not extend time limit.***
+   */
+  function pause()
+    public
+    onlyByOwner()
+    onlyWhenNotPaused()
+  {
+    paused = true;
+    emit ContractPaused();
+  }
+
+  /**
+   * @dev Unpauses this contract.
+   */
+  function unpause()
+    public
+    onlyByOwner()
+    onlyWhenPaused()
+  {
+    paused = false;
+    emit ContractUnpaused();
+  }
+
   // Emitted when a user has placed a new claim on this bounty.
   event NewBountyClaim(address claimant, string validation);
 
   // Emitted when the owner accepts a claim on this bounty.
-  event BountyWon(address claimant);
+  event BountyWon(address winner);
 
   // Emitted when the bounty change changes.
   event StageChanged(Stage stage);
@@ -155,6 +193,7 @@ contract Bounty is Destructible {
    */
   function closeForReview()
     public
+    onlyWhenNotPaused()
     atStage(Stage.AcceptingClaims)
     onlyByOwner()
   {
@@ -167,15 +206,17 @@ contract Bounty is Destructible {
    */
   function submitClaim(string validation)
     public
+    onlyWhenNotPaused()
+    mayAcceptMoreClaims()
     checkStage()
     atStage(Stage.AcceptingClaims)
     notBy(owner)
     notClaimant(msg.sender, "Sender is already a claimant of this bounty.")
   {
+    numberClaims += 1;
     Claim memory newClaim = Claim(msg.sender, validation, true);
     claims[msg.sender] = newClaim;
     claimants[numberClaims] = msg.sender;
-    numberClaims += 1;
 
     emit NewBountyClaim(newClaim.claimant, newClaim.validation);
   }
@@ -186,6 +227,7 @@ contract Bounty is Destructible {
    */
   function acceptClaim(address claimant)
     public
+    onlyWhenNotPaused()
     checkStage()
     atStage(Stage.ClosedInReview)
     onlyByOwner()
@@ -202,6 +244,7 @@ contract Bounty is Destructible {
    */
   function sendAward()
     public
+    onlyWhenNotPaused()
     atStage(Stage.ClosedAwaitingWithdrawal)
     onlyByEither(owner, winner, "Only owner or winner may trigger award withdrawal.")
   {
@@ -212,7 +255,10 @@ contract Bounty is Destructible {
   /**
    * @dev Sets the current bounty stage.
    */
-  function setStage(Stage _stage) internal {
+  function setStage(Stage _stage)
+    internal
+    onlyWhenNotPaused()
+  {
     stage = _stage;
     emit StageChanged(stage);
   }

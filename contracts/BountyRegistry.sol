@@ -13,7 +13,7 @@ contract BountyRegistry {
   uint public creationTime = now;
 
   address[] public bounties;
-  uint public bountyCount = 0;
+  uint256 public bountyCount = 0;
   event BountyCreated(address contractAddress);
 
   modifier greaterThanZero(uint number, string errorMsg) {
