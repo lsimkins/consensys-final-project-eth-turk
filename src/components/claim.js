@@ -52,10 +52,12 @@ class BountyClaim extends Component {
 
   render() {
     return (
-      <div>
-        <div><strong>Completion Proof</strong></div>
+      <div style={{ padding: '8px', borderTop: '1px solid #eee' }}>
+        <div><strong>Claimant</strong></div>
+        <div>{this.state.address}</div>
+        <div><strong>Submitted Proof</strong></div>
         <span>{ this.state.proof }</span>
-        <div>
+        <div style={{ marginTop: '6px' }}>
           <Button
             onClick={() => this.onAcceptClicked()}
             disabled={ !this.canAcceptClaim }

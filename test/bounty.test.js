@@ -72,8 +72,8 @@ contract("Bounty", function(accounts) {
     const validation = "validation";
     await newBounty.submitClaim(validation, { from: alice });
     await newBounty.closeForReview({ from: owner });
-    await catchRevert(await newBounty.acceptClaim(alice, { from: bob }));
-    await catchRevert(await newBounty.acceptClaim(alice, { from: alice }));
+    await catchRevert(newBounty.acceptClaim(alice, { from: bob }));
+    await catchRevert(newBounty.acceptClaim(alice, { from: alice }));
   });
 
   it("should emit \"BountyWon\" event with bounty winner", async () => {

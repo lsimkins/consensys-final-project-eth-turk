@@ -189,6 +189,18 @@ contract Bounty is Destructible {
   }
 
   /**
+   * @dev Returns addresses of all claims.
+   * @return allClaimAddresses
+   */
+  function allClaims()
+    public
+    view
+    returns (address[10] allClaimAddresses)
+  {
+    return claimants;
+  }
+
+  /**
    * @dev Closes this contract before expiration for review of claims.
    */
   function closeForReview()

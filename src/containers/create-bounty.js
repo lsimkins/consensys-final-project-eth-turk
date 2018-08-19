@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { createBounty } from '../actions/bounty-registry';
+import { Button, Input } from 'antd';
 
 class CreateBountyForm extends Component {
   state = {
@@ -51,19 +52,21 @@ class CreateBountyForm extends Component {
         { this.props.owner }
         <form onSubmit={this.onSubmit}>
           <div className="form-input-row">
-            <label>Reward (Wei)</label>
-            <input type="text" name="reward" onChange={this.setBountyParam('reward')} />
+            <label htmlFor="reward">Reward (Wei)</label>
+            <Input type="text" name="reward" onChange={this.setBountyParam('reward')} />
           </div>
           <div className="form-input-row">
-            <label>Description</label>
-            <input type="text" name="description" onChange={this.setBountyParam('description')}/>
+            <label htmlFor="description">Description</label>
+            <Input type="text" name="description" onChange={this.setBountyParam('description')}/>
           </div>
           <div className="form-input-row">
-            <label>Time Limit (Seconds)</label>
-            <input type="text" name="timeLimit" onChange={this.setBountyParam('timeLimit')}/>
+            <label htmlFor="timeLimit">Time Limit (Seconds)</label>
+            <Input type="text" name="timeLimit" onChange={this.setBountyParam('timeLimit')}/>
           </div>
-          <div className="form-input-row">
-            <input type="submit" />
+          <div className="form-input-row" style={{ marginTop: "12px" }}>
+            <Button style={{ width: "100%" }} type="primary" htmlType="submit">
+              Create
+            </Button>
           </div>
         </form>
       </div>

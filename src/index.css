@@ -1,3 +1,7 @@
+* {
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -9,6 +13,10 @@ form {
   max-width: 400px;
 }
 
+main {
+  max-height: calc(100vh - 64px);
+}
+
 .form-input-row {
   width: 100%;
   display: flex;
@@ -16,13 +24,42 @@ form {
   padding: 6px;
 }
 
+.form-input-row input {
+  width: 100%;
+}
+
 .form-input-row label {
   min-width: 160px;
 }
 
 .bounty-row {
+  display: flex;
   padding: 6px;
-  border: 1px solid #ccc;
+  background: white;
+  box-shadow: 0 1px 1px #ccc;
+  margin-bottom: 12px;
+  margin-right: 12px;
+}
+
+.bounty-row-data {
+  padding: 0 6px;
+}
+
+.bounty-row-actions button:not(:first-child) {
+  margin-top: 6px;
+}
+
+.bounty-datum {
+  display: flex;
+}
+
+.bounty-description {
+  border-bottom: 1px solid #eee;
+  margin-bottom: 6px;
+}
+
+.bounty-datum strong {
+  width: 130px;
 }
 
 .bounty-row:not(:last-child) {
@@ -39,4 +76,65 @@ form {
 
 strong {
   font-weight: bold;
+}
+
+#root, .ant-layout {
+  height: 100%;
+}
+
+.ant-layout-header {
+  color: white;
+}
+
+.ant-layout-header h2 {
+  color: white;
+}
+
+.view-bounties {
+  display: flex;
+  flex-direction: row;
+  max-height: 100%;
+}
+
+.view-bounties .ant-list {
+  max-height: calc(100vh - 128px);
+  overflow-y: scroll;
+}
+
+.view-bounties > * {
+  flex: 1;
+}
+
+.bounty-card {
+  background-color: white;
+  box-shadow: 0 1px 1px #ccc;
+  padding: 8px;
+  font-size: 18px;
+}
+
+.bounty-card .bounty-datum:first-child {
+  border-top: 1px solid #eee;
+}
+
+.bounty-card .bounty-datum:not(:last-child) {
+  border-bottom: 1px solid #eee;
+}
+
+.bounty-card .bounty-datum {
+  padding: 8px 16px;
+}
+
+.bounty-card .bounty-datum strong,
+.bounty-card .bounty-datum span {
+  width: 50%;
+}
+
+.bounty-card .bounty-description {
+  padding: 8px 16px;
+  border-bottom: none;
+}
+
+.bounty-card .bounty-address {
+  text-align: center;
+  margin-bottom: 8px;
 }

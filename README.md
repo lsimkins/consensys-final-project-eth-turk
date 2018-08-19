@@ -17,6 +17,9 @@ TODO
 ## Tests
 See comments in test files.
 
+## Notes on code
+I consider the application state management in the front-end portion of this DApp prototype code. Ideally, application state would carefully manage a cache of contract data an avoid unecessary calls to contracts. You'll notice that several components make many calls to retrieve contract data. This is comparable to making api calls within components, which is typically not ideal in data-intensive applications.
+
 ## Limitations & Caveats
 - Proof is simply text. A feature-rich DApp may allow a creator to specify what type of proof they desire, such as an uploaded photo to PFS. Or better yet, once FOAM's proof-of-location reaches maturity, a user could prove they were in a required location at a particular time.
 - For this example, it was necessary to limit the number of claimants to a contract. A bad actor could "game" the system by submitted a claim, and then filling the rest of the available claim slots with bad claims. To do this, they'd need to make each claim from a unique address. This is not much of a deterrent since it is very simple to generate ethereum addresses. A better means would be to identify or fingerprint a claimant by means other than an ethereum address, such as using UPort to ID a claimant.

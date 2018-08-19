@@ -57,7 +57,7 @@ class ClaimBounty extends Component {
     }
 
     return (
-      <div className="claim-bounty">
+      <div className="claim-bounty bounty-card">
         <h2>Claim Bounty</h2>
         { this.isOwner && <h3>This is your bounty!</h3>}
         <div className="bounty-description">
@@ -87,7 +87,6 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    bounty: state.bounty.contracts[ownProps.routeParams.address],
     activeAccount: state.web3.instance ? state.web3.instance.eth.accounts[0] : null
   };
 }

@@ -1,11 +1,18 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import Bounty from '../components/bounty'
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { values } from 'lodash';
-import { Button } from 'antd';
+import { Button, List } from 'antd';
 import { Link } from 'react-router';
 import { collectReward } from '../actions/bounty';
-import { BountyStages, CLOSED_AWAITING_WITHDRAWAL, ACCEPTING_CLAIMS } from '../models/BountyStage';
+import { BountyStages, CLOSED_AWAITING_WITHDRAWAL, ACCEPTING_CLAIMS, CLOSED_FINALIZED } from '../models/BountyStage';
+import BountyListItem from '../components/bounty-list-item';
+import { isExpired } from '../util/bounty';
+
+export const BOUNTY_LIST_FILTER = {
+  ALL: 'all',
+  OWNED: 'owned',
+  WON: 'won',
+};
 
 class BountyList extends Component {
   state = {
@@ -21,88 +28,129 @@ class BountyList extends Component {
   }
 
   get title() {
-    if (this.props.context === 'review') {
-      return "My Bounties";
-    } else {
-      return "All Bounties";
+    switch (this.props.filter) {
+      case BOUNTY_LIST_FILTER.OWNED: return "My Bounties";
+      case BOUNTY_LIST_FILTER.WON: return "Bounties I Won";
+
+      case BOUNTY_LIST_FILTER.ALL:
+      default:
+        return "All Bounties";
     }
+  }
+
+  async bountyMeta(bountyContract) {
+    return {
+      contract: bountyContract,
+      stage: await bountyContract.stage.call(),
+      endTime: await bountyContract.endTime.call(),
+      owner: await bountyContract.owner.call(),
+      winner: await bountyContract.winner.call(),
+    };
   }
 
   async updateState(props) {
     const bountyContracts = props.bounties;
-    const { owner } = props;
+    const { owner, filter } = props;
     let bounties = [];
-    // Note: this is a quick and dirty method of doing this for a project.
+    // Note: this is a quick and dirty method of doing this for a project (aka prototype code).
     // These blocks with async calls and duplicate code
     // should never happen in a production application.
-    if (this.props.context === 'review') {
+    if (filter === BOUNTY_LIST_FILTER.OWNED) {
       for (let i = 0; i < bountyContracts.length; i++) {
         const bountyOwner = await bountyContracts[i].owner.call();
         if (bountyOwner === owner) {
-          bounties.push({
-            contract: bountyContracts[i],
-            bountyOwner
-          });
+          bounties.push(await this.bountyMeta(bountyContracts[i]));
         }
       }
-    } else if (this.props.context === 'won') {
+    } else if (filter === BOUNTY_LIST_FILTER.WON) {
       for (let i = 0; i < bountyContracts.length; i++) {
         const bountyWinner = await bountyContracts[i].winner.call();
         if (bountyWinner === owner) {
-          bounties.push({
-            contract: bountyContracts[i],
-            stage: await bountyContracts[i].stage.call(),
-            winner: bountyWinner
-          });
+          bounties.push(await this.bountyMeta(bountyContracts[i]));
         }
       }
     } else {
       for (let i = 0; i < bountyContracts.length; i++) {
-        bounties.push({
-          contract: bountyContracts[i],
-          stage: await bountyContracts[i].stage.call(),
-          winner: await bountyContracts[i].winner.call()
-        });
+        bounties.push( await this.bountyMeta(bountyContracts[i]));
       }
     }
 
     this.setState({ bounties });
   }
 
+  onViewBountyClick = (bounty) => () => {
+    this.props.onViewBounty && this.props.onViewBounty(bounty.contract);
+  }
+
+  onReviewBountyClick = (bounty) => () => {
+    this.props.onReviewBounty && this.props.onReviewBounty(bounty.contract);
+  }
+
+  onClaimBountyClick = (bounty) => () => {
+    this.props.onClaimBounty && this.props.onClaimBounty(bounty.contract);
+  }
+
   renderBountyContent = (bounty) => {
-    if (this.props.context === 'review') {
-      return (
-        <Button style={{ width: '200px' }}>
-          <Link to={`/task/review-claims/${bounty.contract.address}`}>Review Claims</Link>
+    const { owner } = this.props;
+    let buttons = [
+      <Button
+        key="view-button"
+        type="primary"
+        style={{ width: '140px', display: 'block' }}
+        onClick={ this.onViewBountyClick(bounty) }
+      >
+        View Details
+      </Button>,
+    ];
+
+    if (owner == bounty.owner) {
+      buttons.push(
+        <Button
+          key="rewiew-claims"
+          style={{ width: '140px' }}
+          onClick={this.onReviewBountyClick(bounty)}
+          disabled={
+            BountyStages[bounty.stage] == CLOSED_AWAITING_WITHDRAWAL ||
+            BountyStages[bounty.stage] == CLOSED_FINALIZED
+          }
+        >
+          Review Claims
         </Button>
       );
-    } else if (this.props.context === 'won') {
-      return (
+    } else {
+      buttons.push(
+        <Button
+          key="claim-button"
+          style={{ width: '140px', display: 'block' }}
+          disabled={ BountyStages[bounty.stage] !== ACCEPTING_CLAIMS || isExpired(bounty.endTime) }
+          onClick={this.onClaimBountyClick(bounty)}
+        >
+          Claim
+        </Button>
+      );
+    }
+
+    if (owner == bounty.winner) {
+      buttons.push(
         <Button
           onClick={() => this.props.collectReward(bounty.contract.address)}
-          style={{ width: '200px' }}
+          style={{ width: '140px' }}
+          key="collect-reward"
           disabled={ BountyStages[bounty.stage] !== CLOSED_AWAITING_WITHDRAWAL }
         >
           Collect Reward
         </Button>
       );
-    } else {
-      return (
-        <Button
-          style={{ width: '200px' }}
-          disabled={ BountyStages[bounty.stage] !== ACCEPTING_CLAIMS }
-        >
-          <Link to={`/task/claim/${bounty.contract.address}`}>Claim</Link>
-        </Button>
-      );
     }
+
+    return buttons;
   }
 
   renderBounty = (bounty) => {
     return (
-      <Bounty key={bounty.contract.address} bounty={bounty.contract}>
+      <BountyListItem key={bounty.contract.address} bounty={bounty.contract}>
         { this.renderBountyContent(bounty) }
-      </Bounty>
+      </BountyListItem>
     );
   }
 
@@ -110,9 +158,14 @@ class BountyList extends Component {
     const { bounties } = this.state;
     return (
       <div>
-        <h2>{ this.title }</h2>
         { !bounties.length && <h3>No bounties to show</h3>}
-        { !!bounties.length && bounties.map(this.renderBounty) }
+        { !!bounties.length &&
+          <List
+            itemLayout="horizontal"
+            dataSource={bounties}
+            renderItem={ this.renderBounty }
+          />
+        }
       </div>
     );
   }

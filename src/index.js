@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, Route, IndexRoute, browserHistory } from 'react-router'
+import { Router, Route, IndexRoute, IndexRedirect, browserHistory, Redirect } from 'react-router'
 import { Provider } from 'react-redux'
 import { syncHistoryWithStore } from 'react-router-redux'
 import './index.css';
-import BountyList from './containers/bounty-list';
+import ViewBounties from './components/view-bounties';
 import ReviewBounty from './containers/review-bounty';
+import BountyTabs from './components/bounty-tabs';
 
 // Layouts
 import App from './App'
@@ -23,16 +24,13 @@ ReactDOM.render((
       <Router history={history}>
         <Route path="/" component={App}>
           <IndexRoute component={Home} />
-          <Route path="task" component={Home}>
+          <Route path="bounty" component={Home}>
             <IndexRoute component={BountyCard} />
             <Route path="create" component={BountyCard} />
-            <Route path="claim/:address" component={ClaimBounty} />
-            <Route path="review" component={() => <BountyList context={"review"} /> } />
-            <Route path="review/:address" component={ReviewBounty} />
-            <Route path="review-claims/:address" component={ReviewBounty} />
-            <Route path="view-all" component={BountyList} />
-            <Route path="view-won" component={() => <BountyList context={"won"} />} />
+            <Route path="list" component={ViewBounties} />
+            <Route path="*" exact={true} component={BountyCard} />
           </Route>
+          <Redirect from='*' to='/bounty/create' />
           {/* <Route path="dashboard" component={UserIsAuthenticated(Dashboard)} />
           <Route path="profile" component={UserIsAuthenticated(Profile)} /> */}
         </Route>

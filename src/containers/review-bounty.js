@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { createBounty } from '../actions/bounty-registry';
-import Bounty from '../components/bounty';
+import BountyCard from '../components/bounty-card';
 import Claim from '../components/claim';
 import { addressIsSet } from '../util/bounty';
 
@@ -22,8 +22,10 @@ class ReviewBounty extends Component {
 
   async updateState(props) {
     if (props.bounty) {
-      const claimAddresses = await props.bounty.claims.call();
+      const claimAddresses = await props.bounty.allClaims.call();
   
+      console.log(claimAddresses);
+
       this.setState({
         claimAddresses: claimAddresses.filter(addressIsSet)
       });
@@ -35,17 +37,19 @@ class ReviewBounty extends Component {
 
     if (bounty) {
       return (
-        <div>
-          <h2>Review Bounty</h2>
-          <Bounty bounty={bounty}>
-            <h3>Claims</h3>
-            <em>Choose "Accept Claim" to award claimant the bounty.</em>
-            {
-              this.state.claimAddresses.map(
-                address => <Claim key={address} bounty={bounty} claimAddress={address} />
-              )
-            }
-          </Bounty>
+        <div className="bounty-card">
+          <h2>Reviewing Bounty<br/>{ bounty.address }</h2>
+
+          <h3>Claims</h3>
+          <em>Choose "Accept Claim" to award claimant the bounty.</em>
+          <div style={{ marginTop: '8px' }}>
+          { !this.state.claimAddresses.length && "No claims yet" }
+          {
+            this.state.claimAddresses.map(
+              address => <Claim key={address} bounty={bounty} claimAddress={address} />
+            )
+          }
+          </div>
         </div>
       );
     } else {
@@ -58,8 +62,6 @@ const mapDispatchToProps = {
   createBounty
 }
 
-const mapStateToProps = (state, ownProps) => ({
-  bounty: state.bounty.contracts[ownProps.routeParams.address]
-})
+const mapStateToProps = (state, ownProps) => ({})
 
 export default connect(mapStateToProps, mapDispatchToProps)(ReviewBounty)

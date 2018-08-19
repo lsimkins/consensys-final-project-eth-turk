@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router'
-import { HiddenOnlyAuth, VisibleOnlyAuth } from './util/wrappers.js'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router';
 import {web3connect} from './actions/web3.js';
 import {instantiateBountyContract} from './actions/bounty-registry.js';
-
-// UI Components
-import LoginButtonContainer from './user/ui/loginbutton/LoginButtonContainer.js'
-import LogoutButtonContainer from './user/ui/logoutbutton/LogoutButtonContainer.js'
+import { Layout, Menu } from 'antd';
+const { Header, Footer, Content, Sider } = Layout;
+const { SubMenu } = Menu;
+import { Link } from 'react-router';
 
 // Styles
 import './css/oswald.css'
@@ -23,36 +22,56 @@ class App extends Component {
     });
   }
 
+  get activeTab() {
+    switch (this.props.location.pathname) {
+      case "/bounty/list": return "view-bounties";
+      case "/bounty/create":
+      default:
+        return "create-bounty";
+    }
+  }
+
   render() {
-    const OnlyAuthLinks = VisibleOnlyAuth(() =>
-      <span>
-        <li className="pure-menu-item">
-          <Link to="/dashboard" className="pure-menu-link">Dashboard</Link>
-        </li>
-        <li className="pure-menu-item">
-          <Link to="/profile" className="pure-menu-link">Profile</Link>
-        </li>
-        <LogoutButtonContainer />
-      </span>
-    )
-
-    const OnlyGuestLinks = HiddenOnlyAuth(() =>
-      <span>
-        <LoginButtonContainer />
-      </span>
-    )
-
     return (
-      <div className="App">
-        <nav className="navbar pure-menu pure-menu-horizontal">
-          <Link to="/" className="pure-menu-heading pure-menu-link">Geo Turk</Link>
-          <ul className="pure-menu-list navbar-right">
-            <OnlyGuestLinks />
-            <OnlyAuthLinks />
-          </ul>
-        </nav>
+      <div style={{ height: '100%' }}>
+        <Layout>
+          <Header>
+            <h2>ETH Turk</h2>
+          </Header>
 
-        {this.props.children}
+          <Layout>
+            <Sider style={{ background: '#fff' }}>
+              <Menu
+                theme="light"
+                mode="inline"
+                defaultSelectedKeys={[ this.activeTab ]}
+                style={{ lineHeight: '64px' }}
+              >
+                <Menu.Item key="create-bounty">
+                  <Link to="/bounty/create">Create New Bounty</Link>
+                </Menu.Item>
+                <Menu.Item key="view-bounties">
+                  <Link to="/bounty/list">View Bounties</Link>
+                </Menu.Item>
+              </Menu>
+              <div
+                style={{
+                  marginTop: '12px',
+                  padding: '12px',
+                  maxWidth: '100%',
+                  borderTop: '1px solid #eee'
+                }}>
+                <strong>Current account</strong><br/>
+                <span style={{ color: '#1890ff', wordWrap: 'break-word' }}>{this.props.activeAccount}</span>
+              </div>
+            </Sider>
+            <Content>
+              <main style={{ padding: "8px 16px" }}>
+                {this.props.children}
+              </main>
+            </Content>
+          </Layout>
+        </Layout>
       </div>
     );
   }
@@ -61,10 +80,11 @@ class App extends Component {
 const mapDispatchToProps = {
   web3connect,
   instantiateBountyContract,
-}
+};
 
 const mapStateToProps = (state) => ({
-  web3: state.web3
-})
+  web3: state.web3.instance,
+  activeAccount: state.web3.activeAccount
+});
 
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));

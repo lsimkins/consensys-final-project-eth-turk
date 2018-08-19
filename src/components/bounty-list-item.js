@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { BountyStages } from '../models/BountyStage';
 import { addressIsSet, isExpired } from '../util/bounty';
 
-class Bounty extends Component {
+class BountyListItem extends Component {
   state = {
     reward: null,
     description: null,
@@ -27,6 +27,7 @@ class Bounty extends Component {
   }
 
   async updateState(props) {
+    // Prototype code
     const reward = await props.bounty.reward.call();
     const description = await props.bounty.description.call();
     const numberClaims = await props.bounty.numberClaims.call();
@@ -49,50 +50,44 @@ class Bounty extends Component {
   render() {
     const { description, reward, endTime, numberClaims, winner, stage } = this.state;
     return (
-      <div className="bounty-row">
-        <div className="bounty-description">
-          { description }
-        </div>
-
-        <div className="bounty-reward" >
-          <strong>Reward: </strong>
-          <span>{ reward && reward.toString() }</span>
-        </div>
-
-        <div className="bounty-ends-in" >
-          <strong>Current Stage: </strong>
-          <span>{ stage }</span>
-        </div>
-
-        <div className="bounty-ends-in" >
-          <strong>Ends In: </strong>
-          <span>
-            {
-              isExpired(endTime) ?
-                "Bounty Ended!" :
-                this.secondsUntilEnd + " seconds"
-            }
-          </span>
-        </div>
-
-        <div className="bounty-claims" >
-          <strong>Number of Claims: </strong>
-          <span>{ numberClaims && numberClaims.toString() }</span>
-        </div>
-
-        <div className="bounty-reward" >
-          <strong>Winner: </strong>
-          <span>
-            {  winner && addressIsSet(winner) ? winner.toString() : 'N/A' }
-          </span>
-        </div>
-
-        <div style={{ padding: '6px' }}>
+      <li className="bounty-row">
+        <div className="bounty-row-actions" style={{ padding: '6px' }}>
           { this.props.children }
         </div>
-      </div>
+        <div className="bounty-row-data">
+          <div className="bounty-description bounty-datum">
+            { description }
+          </div>
+
+          <div className="bounty-reward bounty-datum" >
+            <strong>Reward </strong>
+            <span>{ reward && reward.toString() }</span>
+          </div>
+
+          <div className="bounty-ends-in bounty-datum" >
+            <strong>Current Stage </strong>
+            <span>{ stage }</span>
+          </div>
+
+          <div className="bounty-ends-in bounty-datum" >
+            <strong>Ends In </strong>
+            <span>
+              {
+                isExpired(endTime) ?
+                  "Bounty Ended!" :
+                  this.secondsUntilEnd + " seconds"
+              }
+            </span>
+          </div>
+
+          <div className="bounty-claims bounty-datum" >
+            <strong>Number of Claims </strong>
+            <span>{ numberClaims && numberClaims.toString() }</span>
+          </div>
+        </div>
+      </li>
     );
   }
 }
 
-export default Bounty
+export default BountyListItem
