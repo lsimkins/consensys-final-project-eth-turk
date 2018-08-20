@@ -1,7 +1,7 @@
-# Simple Bounty DApp.
+# Simple Bounty DApp
 
 ## Purpose
-This is a simple Bounty DApp to demonstrate basic Solidity contract development The goal was to create a project MVP modeling the core workflow with a minimalistic UI.
+This is a simple Bounty DApp to demonstrate basic Solidity contract development. The goal was to create a project MVP modeling the core workflow with a minimalistic UI.
 
 The workflow is as follows.
 - An ethereum account holder creates a bounty, specifying a description of what needs to be completed, a time limit, and an award.
@@ -12,7 +12,25 @@ The workflow is as follows.
 - Finally, the creator may destroy the bounty and reclaim any funds left within the contract. If the bounty expires without any claims, this allows the creator to reclaim the contract reward.
 
 ## Setup
-TODO
+1. Ensure you have nodejs, npm, truffle, and ganache-cli installed.
+2. If running in linux, please ensure the `node` command runs nodejs. If you get the error `node: not found` when running this project, you can create a symlink to fix the project.
+   - `ln -s /usr/bin/nodejs /usr/bin/node`
+3. Install project dependences by running `npm install` in the project root.
+4. Start ganache by running `ganache-cli`.
+5. Make sure to compile and migrate the contracts using truffle before running the front-end. This project makes use of a registry contract that must be deployed to your development environment. This can be done easily by running the following commands.
+   - `truffle console`
+   - (In truffle console) `compile`
+   - (In truffle console) `migrate`
+
+After following the steps above, your environment should be ready to test and run the DApp.
+### Testing
+Run `test` in the truffle console.
+
+### Running Front-End
+Run `npm run start` to serve the front-end. Your default browser should open to `http://localhost:3000`.
+
+### Additional Requirements
+This DApp was tested using the MetaMask web3 browser extension against a locally running development blockchain in MacOS and Ubuntu 16.04. Be sure you have a valid connection to your local development blockchain.
 
 ## Tests
 See comments in test files.
