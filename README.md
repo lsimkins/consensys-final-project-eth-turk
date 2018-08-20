@@ -35,6 +35,9 @@ This DApp was tested using the MetaMask web3 browser extension against a locally
 ## Tests
 See comments in test files.
 
+## Library Demonstration
+Solidity contract libary usage is demonstrated in the `ArbitrationLibraryDemo.sol` contract. In addition, the `Bounty.sol` contract inherits from an OpenZepplin library contract.
+
 ## Notes on code
 I consider the application state management in the front-end portion of this DApp prototype code. Ideally, application state would carefully manage a cache of contract data an avoid unecessary calls to contracts. You'll notice that several components make many calls to retrieve contract data. This is comparable to making api calls within components, which is typically not ideal in data-intensive applications.
 
