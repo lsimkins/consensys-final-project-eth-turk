@@ -3,13 +3,16 @@
 ## Purpose
 This is a simple Bounty DApp to demonstrate basic Solidity contract development. The goal was to create a project MVP modeling the core workflow with a minimalistic UI.
 
-The workflow is as follows.
-- An ethereum account holder creates a bounty, specifying a description of what needs to be completed, a time limit, and an award.
-- Other users review available bounties.
-- Users submit claims to a bounty, but only one claim per address holder. A bounty may have multiple claimants.
-- After the time limit is expired, the bounty creator may review claims and select a winner.
-- Once a winner has been selected, they may withdraw the award from the bounty.
-- Finally, the creator may destroy the bounty and reclaim any funds left within the contract. If the bounty expires without any claims, this allows the creator to reclaim the contract reward.
+## Recommended Testing Workflow
+- Select an account to be the "bounty creator."
+- Use that account to create a bounty, specifying a description of what needs to be completed, a time limit, and an award. For testing, a short time limit is recommended since bounties may not be awarded through the UI until a bounty has expired.
+- Wait for transaction to complete, and view your bounty in the list of bounties.
+- Change accounts to an account you wish to be the "bounty claimant."
+- Claim the bounty posted by the previous account and add a text description of proof.
+- Switch back to creator account.
+- Wait for bounty time limit to expire, review bounty claims, and accept the claim.
+- Switch back to claimaint account.
+- The created bounty should now have a "Collect Reward" button. You may now collect your reward.
 
 ## Setup
 1. Ensure you have nodejs, npm, truffle, and ganache-cli installed.
