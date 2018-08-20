@@ -20,7 +20,7 @@ ReactDOM.render((
     <Provider store={store}>
       <Router history={history}>
         <Route path="/" component={App}>
-          <IndexRoute component={Home} />
+          <IndexRoute component={() => <Home><BountyCard /></Home>} />
           <Route path="bounty" component={Home}>
             <IndexRoute component={BountyCard} />
             <Route path="create" component={BountyCard} />

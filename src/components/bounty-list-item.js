@@ -72,7 +72,7 @@ class BountyListItem extends Component {
 
           <div className="bounty-reward bounty-datum" >
             <strong>Reward </strong>
-            <span>{ reward && reward.toString() }</span>
+            <span>{ reward && (reward.toString() + " Wei")}</span>
           </div>
 
           <div className="bounty-ends-in bounty-datum" >
